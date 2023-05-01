@@ -11,6 +11,8 @@ from src.exception import CustomException
 # import the logger module from the correct relative path
 from src.logger import logging
 
+from src.components.data_transformation import DataTransformation
+
 @dataclass
 class DataIngestionConfig:
     train_data_path: str=os.path.join('artifacts',"train.csv")
@@ -59,5 +61,13 @@ class DataIngestion:
 
 if __name__ == "__main__":
 
-    obj = DataIngestion()
-    obj.initiate_data_ingestion()
+    data_ingestion_obj = DataIngestion()
+    train_path, test_path = data_ingestion_obj.initiate_data_ingestion()
+
+    # processing through data tranformation
+    train_transformation_obj = DataTransformation(train_path)
+    test_transformation_obj = DataTransformation(test_path)
+
+    train_transformation_obj.initiate_data_transformation()
+    test_transformation_obj.initiate_data_transformation()
+
