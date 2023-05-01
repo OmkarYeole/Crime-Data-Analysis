@@ -8,62 +8,62 @@ from src.exception import CustomException
 from src.logger import logging
 
 class DataTransformation:
-    def __init__(self, train_path:str):
-        self.train_path = train_path
+    def __init__(self, data_path:str):
+        self.data_path = data_path
         
     def initiate_data_transformation(self):
         logging.info("Entered the data transformation method or component")
         try:
-            # Read in the training data
-            train_data = pd.read_csv(self.train_path, parse_dates=['OCCURRED_ON_DATE'], low_memory=False)
+            # Read the data
+            data = pd.read_csv(self.data_path, parse_dates=['OCCURRED_ON_DATE'], low_memory=False)
 
             # drop INCIDENT_NUMBER feature
-            train_data.drop(columns=['INCIDENT_NUMBER'], axis=1, inplace=True)
+            data.drop(columns=['INCIDENT_NUMBER'], axis=1, inplace=True)
 
             # Imputing SHOOTING columns as it contains more NAN values
-            train_data['SHOOTING'] = np.where(train_data['SHOOTING'] == 'Y', 1, 0)
+            data['SHOOTING'] = np.where(data['SHOOTING'] == 'Y', 1, 0)
 
             #  Encode categorical variables as integers
             label_encoder = LabelEncoder()
-            train_data['DAY_OF_WEEK'] = label_encoder.fit_transform(train_data['DAY_OF_WEEK'])
-            train_data['OFFENSE_CODE_GROUP'] = label_encoder.fit_transform(train_data['OFFENSE_CODE_GROUP'])
-            train_data['DISTRICT'] = label_encoder.fit_transform(train_data['DISTRICT'])
+            data['DAY_OF_WEEK'] = label_encoder.fit_transform(data['DAY_OF_WEEK'])
+            data['OFFENSE_CODE_GROUP'] = label_encoder.fit_transform(data['OFFENSE_CODE_GROUP'])
+            data['DISTRICT'] = label_encoder.fit_transform(data['DISTRICT'])
 
             # Extract date feature
-            train_data['OCCURRED_ON_DATE'] = pd.to_datetime(train_data['OCCURRED_ON_DATE'])
-            train_data['YEAR'] = train_data['OCCURRED_ON_DATE'].dt.year
-            train_data['MONTH'] = train_data['OCCURRED_ON_DATE'].dt.month
-            train_data['DAY'] = train_data['OCCURRED_ON_DATE'].dt.day
-            train_data['HOUR'] = train_data['OCCURRED_ON_DATE'].dt.hour
+            data['OCCURRED_ON_DATE'] = pd.to_datetime(data['OCCURRED_ON_DATE'])
+            data['YEAR'] = data['OCCURRED_ON_DATE'].dt.year
+            data['MONTH'] = data['OCCURRED_ON_DATE'].dt.month
+            data['DAY'] = data['OCCURRED_ON_DATE'].dt.day
+            data['HOUR'] = data['OCCURRED_ON_DATE'].dt.hour
 
             # Drop the original date column
-            train_data.drop('OCCURRED_ON_DATE', axis=1, inplace=True)
+            data.drop('OCCURRED_ON_DATE', axis=1, inplace=True)
 
             # Transform location data into latitude and longitude features
-            train_data['LATITUDE'] = train_data['Location'].str.extract(r'\(([-+]?[0-9]*\.?[0-9]+),\s*([-+]?[0-9]*\.?[0-9]+)\)')[0].astype(float)
-            train_data['LONGITUDE'] = train_data['Location'].str.extract(r'\(([-+]?[0-9]*\.?[0-9]+),\s*([-+]?[0-9]*\.?[0-9]+)\)')[1].astype(float)
+            data['LATITUDE'] = data['Location'].str.extract(r'\(([-+]?[0-9]*\.?[0-9]+),\s*([-+]?[0-9]*\.?[0-9]+)\)')[0].astype(float)
+            data['LONGITUDE'] = data['Location'].str.extract(r'\(([-+]?[0-9]*\.?[0-9]+),\s*([-+]?[0-9]*\.?[0-9]+)\)')[1].astype(float)
 
             # Drop the original location column
-            train_data.drop(columns=['Location', 'Lat', 'Long'], axis=1, inplace=True)
+            data.drop(columns=['Location', 'Lat', 'Long'], axis=1, inplace=True)
 
             # Split the REPORTING_AREA feature into numeric and non-numeric components
-            train_data['REPORTING_AREA'] = train_data['REPORTING_AREA'].str.extract(r'(\d+)')[0].astype(float)
-            train_data['REPORTING_AREA_STR'] = train_data['REPORTING_AREA'].astype(str)
-            train_data.drop('REPORTING_AREA', axis=1, inplace=True)
+            data['REPORTING_AREA'] = data['REPORTING_AREA'].str.extract(r'(\d+)')[0].astype(float)
+            data['REPORTING_AREA_STR'] = data['REPORTING_AREA'].astype(str)
+            data.drop('REPORTING_AREA', axis=1, inplace=True)
 
             # Encode categorical variables as integers
             label_encoder = LabelEncoder()
-            train_data['OFFENSE_CODE_GROUP'] = label_encoder.fit_transform(train_data['OFFENSE_CODE_GROUP'])
-            train_data['UCR_PART'] = label_encoder.fit_transform(train_data['UCR_PART'])
-            train_data['STREET'] = label_encoder.fit_transform(train_data['STREET'])
-            train_data['REPORTING_AREA_STR'] = label_encoder.fit_transform(train_data['REPORTING_AREA_STR'])
+            data['OFFENSE_CODE_GROUP'] = label_encoder.fit_transform(data['OFFENSE_CODE_GROUP'])
+            data['UCR_PART'] = label_encoder.fit_transform(data['UCR_PART'])
+            data['STREET'] = label_encoder.fit_transform(data['STREET'])
+            data['REPORTING_AREA_STR'] = label_encoder.fit_transform(data['REPORTING_AREA_STR'])
 
             # Drop OFFENSE_DESCRIPTION column
-            train_data.drop(columns=['OFFENSE_DESCRIPTION'], axis=1, inplace=True)
+            data.drop(columns=['OFFENSE_DESCRIPTION'], axis=1, inplace=True)
 
             logging.info("Data transformation is completed")
 
-            return train_data
+            return data
 
         except Exception as e:
             raise CustomException(e,sys)
