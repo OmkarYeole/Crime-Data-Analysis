@@ -12,6 +12,7 @@ from src.exception import CustomException
 from src.logger import logging
 
 from src.components.data_transformation import DataTransformation
+from src.components.predictive_model_trainer import ModelTrainer
 
 @dataclass
 class DataIngestionConfig:
@@ -65,9 +66,14 @@ if __name__ == "__main__":
     train_path, test_path = data_ingestion_obj.initiate_data_ingestion()
 
     # processing through data tranformation
-    train_transformation_obj = DataTransformation(train_path)
-    test_transformation_obj = DataTransformation(test_path)
+    data_tranformation_obj = DataTransformation()
 
-    train_transformation_obj.initiate_data_transformation()
-    test_transformation_obj.initiate_data_transformation()
+    # passing the tarining and testing dataset
+    train_arr = data_tranformation_obj.initiate_data_transformation(train_path)
+    test_arr = data_tranformation_obj.initiate_data_transformation(test_path)
+
+    # pass the dataset into model trainer file
+    model_trainer_obj = ModelTrainer()
+    print(model_trainer_obj.initiate_model_trainer(train_arr,test_arr))
+
 

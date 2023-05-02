@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from dataclasses import dataclass
 from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import LabelEncoder, StandardScaler, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
@@ -26,27 +27,37 @@ class DataTransformation:
         logging.info("Entered into get tranformation object function")
         try:
             # Define categorical and numeric features
-            categorical_columns = ['DAY_OF_WEEK', 'DISTRICT', 'OFFENSE_CODE_GROUP', 'UCR_PART', 'STREET',]
+            categorical_columns = ['DAY_OF_WEEK', 'DISTRICT', 'UCR_PART', 'STREET']
             numerical_columns = ['LATITUDE', 'LONGITUDE', 'REPORTING_AREA_STR', 'YEAR', 'MONTH', 'DAY', 'HOUR', 'SHOOTING']
 
             # Define preprocessing steps for categorical features
-            cat_transformer = Pipeline(steps=[
-                ('ordinal_encoder', OrdinalEncoder())
-            ])
+            cat_transformer = Pipeline(
+                steps=[
+                    ("imputer", SimpleImputer(strategy="most_frequent")),
+                    ("ordinal_encoder", OrdinalEncoder()),
+                    ("scaler", StandardScaler(with_mean=False))
+                ]
+            )
 
             # Define preprocessing steps for numeric features
-            num_transformer = Pipeline(steps=[
-                ('standard_scaler', StandardScaler())
-            ])
+            # Define preprocessing steps for numeric features
+            num_transformer = Pipeline(
+                steps=[
+                    ('imputer', SimpleImputer(strategy='mean')),
+                    ('standard_scaler', StandardScaler())
+                ]
+            )
 
             logging.info(f"Categorical columns: {categorical_columns}")
             logging.info(f"Numerical columns: {numerical_columns}")
 
             # Define column transformer to apply preprocessing steps to each feature type
-            preprocessor = ColumnTransformer(transformers=[
+            preprocessor = ColumnTransformer(
+                transformers=[
                 ('num_pipeline', num_transformer, numerical_columns),
                 ('cat_pipeline', cat_transformer, categorical_columns)
-            ])
+                ]
+            )
 
 
             logging.info("Completed the get tranformation object function")
@@ -99,8 +110,13 @@ class DataTransformation:
 
             preprocessor_obj = self.get_data_transformer_object()
 
-            print("data shape before transformation:", data.columns)
+            # split target variable and training variable
+            target_feature = data['OFFENSE_CODE_GROUP']
+            data = data.drop(columns=['OFFENSE_CODE_GROUP'], axis=1)
+
             data_arr = preprocessor_obj.fit_transform(data)
+            label_encoder = LabelEncoder()
+            target_arr = label_encoder.fit_transform(target_feature)
 
             logging.info("Saving preprocessor object")
 
@@ -114,24 +130,7 @@ class DataTransformation:
 
             logging.info("Data transformation is completed")
 
-            return data_arr
+            return data_arr, target_arr
 
         except Exception as e:
             raise CustomException(e,sys)
-
-            
-
-if __name__ == "__main__":
-    ######
-    # After this the train and test path
-    # will return by data_ingestion.py file
-    #####
-    # Define the paths to the training and testing data
-    train_path = 'artifacts/train.csv'
-
-    # Instantiate the DataTransformation class and initiate data transformation
-    data_transformation_obj = DataTransformation()
-    data_transformed = data_transformation_obj.initiate_data_transformation(train_path)
-
-    # Print the transformed data for inspection
-    print(data_transformed)
