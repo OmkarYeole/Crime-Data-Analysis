@@ -1,6 +1,7 @@
 import os
 import sys
 import numpy as np
+import pandas as pd
 from dataclasses import dataclass
 
 
@@ -160,7 +161,7 @@ class ModelTrainer:
 
             predicted=best_model.predict(X_test)
 
-            r2_square = r2_score(y_test, predicted)
+            r2_square = f1_score(y_test, predicted)
             return r2_square
             
         except Exception as e:
