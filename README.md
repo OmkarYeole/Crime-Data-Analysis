@@ -16,11 +16,15 @@ This project focuses on creating a web application to analyze and understand var
 
 ## Technologies Used
 
-**Frontend:** HTML5, CSS3, JavaScript
-**Backend:** Python, Flask
-**Database:** MongoDB
-Data Visualization: Python, Matploblib, Numpy, Pandas, Seaborn.
-Hosting: Heroku
+**Frontend:** HTML5, CSS3, JavaScript.
+
+**Backend:** Python, Flask.
+
+**Database:** MongoDB.
+
+**Data Visualization:** Python, Matploblib, Numpy, Pandas, Seaborn..
+
+**Hosting:** Heroku.
 
 # Usage
 
