@@ -33,3 +33,10 @@ This project focuses on creating a web application to analyze and understand var
 **Share Experiences:** Use the anonymous reporting feature to share your own experiences and read about others’ experiences.
 
 **Stay Informed:** Utilize the search and filter options to get specific information relevant to your interests and concerns.
+
+
+## Contact
+
+For any questions or further information, you can reach me at omkaryeole@gmail.com.
+
+Thank you for visiting the Crime Data Analysis project!
